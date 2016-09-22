@@ -11,12 +11,17 @@
 # for SSD journals.
 
 - include: ./check_devices_static.yml
-  when: not osd_auto_discovery
+  when:
+    - not osd_auto_discovery
+    - not osd_containerized_deployment
+
   # Hard code this so we will skip the entire file instead of individual tasks (Default isn't Consistent)
   static: False
 
 - include: ./check_devices_auto.yml
-  when: osd_auto_discovery
+  when:
+    - osd_auto_discovery
+    - not osd_containerized_deployment
   # Hard code this so we will skip the entire file instead of individual tasks (Default isn't Consistent)
   static: False
 
@@ -26,7 +31,9 @@
   changed_when: false
   failed_when: false
   register: journal_partition_status
-  when: raw_multi_journal
+  when:
+    - raw_multi_journal
+    - not osd_containerized_deployment
 
 - name: fix partitions gpt header or labels of the journal devices
   shell: "sgdisk --zap-all --clear --mbrtogpt -- {{ item.1 }} || sgdisk --zap-all --clear --mbrtogpt -- {{ item.1 }}"
@@ -37,3 +44,4 @@
   when:
     - raw_multi_journal
     - item.0.rc != 0
+    - not osd_containerized_deployment

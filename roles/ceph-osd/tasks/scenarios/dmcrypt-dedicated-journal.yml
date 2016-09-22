@@ -2,6 +2,7 @@
 ## SCENARIO 6: DMCRYPT N JOURNAL DEVICES FOR N OSDS
 
 - include: ../check_devices.yml
+  when: not osd_containerized_deployment
 
 # NOTE (leseb): the prepare process must be parallelized somehow...
 # if you have 64 disks with 4TB each, this will take a while
@@ -27,3 +28,4 @@
     - dmcrypt_dedicated_journal
 
 - include: ../activate_osds.yml
+  when: not osd_containerized_deployment
